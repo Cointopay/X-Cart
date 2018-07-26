@@ -1,0 +1,70 @@
+{##
+ # CoinPayments configuration page
+ #}
+
+<table cellspacing="1" cellpadding="5" class="settings-table">
+
+    <tr>
+        <td class="setting-name">
+            <label for="settings_merchantId">{{ t('Merchant ID') }}</label>
+        </td>
+        <td>
+            <input type="text" id="settings_merchantId" name="settings[merchantId]" value="{{ this.paymentMethod.getSetting('merchantId') }}" class="validate[required,maxSize[255]]" />
+        </td>
+    </tr>
+    <tr>
+        <td class="setting-name">
+            <label for="settings_securityCode">{{ t('Security Code') }}</label>
+        </td>
+        <td>
+            <input type="text" id="settings_securityCode" name="settings[security_code]" value="{{ this.paymentMethod.getSetting('security_code') }}" class="validate[required,maxSize[255]]" />
+        </td>
+    </tr>
+    <tr>
+        <input type="hidden" id="coin_id" value="{{ this.paymentMethod.getSetting('coin_id') }}">
+        <td class="setting-name">
+            <label for="settings_coinId">{{ t('Coin') }}</label>
+        </td>
+        <td>
+			<select id="settings_coinId" name="settings[coin_id]">
+
+            </select>
+        </td>
+    </tr>
+</table>
+
+<script>
+
+    $(document).ready(function () {
+        var merchant_id = $('#settings_merchantId').val();
+        updateCoins(merchant_id);
+        $('#settings_merchantId').change(function (e) {
+            updateCoins(merchant_id);
+        });
+    });
+
+    function updateCoins(merchant_id) {
+        merchant = merchant_id == '' ? 12 : merchant_id;
+        $.ajax({
+            'url': window.location.origin+window.location.pathname + '?target=controller_ajax',
+            'data' : {
+                'merchant_id' : merchant
+            },
+            'type' : 'GET',
+            'crossDomain': true,
+            'dataType' : 'JSON',
+            'success' : function (data) {
+                var appenddata;
+                 $.each(data, function (id, value) {
+                     appenddata += "<option value = '" + id + "'>" + value + " </option>";
+                 });
+                 $('#settings_coinId').html(appenddata);
+                 var selected_coin = $('#coin_id').val();
+                 $('#settings_coinId').val(selected_coin);
+            },
+            'error' : function () {
+                console.log('error occured');
+            }
+        });
+    }
+</script>
