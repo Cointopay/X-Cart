@@ -38,8 +38,15 @@ class CoinToPay extends \XLite\Model\Payment\Base\WebBased
         $request = \XLite\Core\Request::getInstance();
         $status = $request->status;
         $not_enough = isset($request->notenough) ? $request->notenough : 0;
+        $response_data['TransactionID'] = $request->TransactionID;
+        $response_data['ConfirmCode'] = $request->ConfirmCode;
+        $response_data['Status'] = $status;
+        $validation = $this->validateResponse($response_data);
+        if(!$validation) {
+            $this->transaction->setNote('Credentials do not match to Cointopay');
+            \XLite\Core\TopMessage::addWarning('Data tempered ! Credentials do not match to Cointopay');
 
-        if ($request->cancel) {
+        }elseif ($request->cancel) {
             $this->setDetail(
                 'status',
                 'Customer has canceled checkout before completing their payments',
@@ -50,12 +57,14 @@ class CoinToPay extends \XLite\Model\Payment\Base\WebBased
 
         }elseif ($status == 'paid') {
             $str = 'Payment successfully paid';
-            $str .= 'Transaction ID: ' . $request->transactionID . PHP_EOL;
+            $str .= 'Transaction ID: ' . $request->transaction_id . PHP_EOL;
             $transaction_status = $transaction::STATUS_SUCCESS;
             if($not_enough) {
                 $str = 'Payment partially paid';
-                $str .= 'Transaction ID: ' . $request->transactionID . PHP_EOL;
+                $str .= 'Transaction ID: ' . $request->transaction_id . PHP_EOL;
                 $transaction_status = $transaction::STATUS_PENDING;
+                \XLite\Core\TopMessage::addWarning('Your payment was partially paid (Payment was not fully paid to Cointopay)');
+
             }
             $this->setDetail('payment_details',$str, 'Status');
             $this->transaction->setNote($str);
@@ -91,13 +100,21 @@ class CoinToPay extends \XLite\Model\Payment\Base\WebBased
 
         $status = $request->status;
         $not_enough = (bool)$request->notenough;
-        if ($status == 'paid') {
+        $response_data['TransactionID'] = $request->TransactionID;
+        $response_data['ConfirmCode'] = $request->ConfirmCode;
+        $response_data['Status'] = $status;
+        $validation = $this->validateResponse($response_data);
+        if(!$validation) {
+            $this->transaction->setNote('Credentials do not match to Cointopay');
+            \XLite\Core\TopMessage::addWarning('Data tempered ! Credentials do not match to Cointopay');
+
+        }elseif ($status == 'paid') {
             $str = 'Payment successfully paid';
-            $str .= 'Transaction ID: ' . $request->transactionID . PHP_EOL;
+            $str .= 'Transaction ID: ' . $request->transaction_id . PHP_EOL;
             $transaction_status = $transaction::STATUS_SUCCESS;
             if($not_enough) {
                 $str = 'Payment partially paid';
-                $str .= 'Transaction ID: ' . $request->transactionID . PHP_EOL;
+                $str .= 'Transaction ID: ' . $request->transaction_id . PHP_EOL;
                 $transaction_status = $transaction::STATUS_PENDING;
             }
             $this->transaction->setDetail('payment_details',$str);
@@ -115,6 +132,32 @@ class CoinToPay extends \XLite\Model\Payment\Base\WebBased
 
     }
 
+    /**
+     * @param $response
+     * @return bool
+     */
+    public function validateResponse($response) {
+        $validate = true;
+        $merchant_id = $this->getSetting('merchantId');
+        $transaction_id = $response['TransactionID'];
+        $confirm_code = $response['ConfirmCode'];
+        $url = "https://app.cointopay.com/v2REAPI?MerchantID=$merchant_id&Call=QA&APIKey=_&output=json&TransactionID=$transaction_id&ConfirmCode=$confirm_code";
+        $curl = curl_init($url);
+        curl_setopt_array($curl, array(
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_SSL_VERIFYPEER => 0
+        ));
+        $result = curl_exec($curl);
+        $result = json_decode($result, true);
+        if(!$result || !is_array($result)) {
+            $validate == false;
+        }else{
+            if($response['Status'] != $result['Status']) {
+                $validate = false;
+            }
+        }
+        return $validate;
+    }
     /**
      * Logging the data under Cointopay
      * Available if developer_mode is on in the config file
@@ -217,8 +260,8 @@ class CoinToPay extends \XLite\Model\Payment\Base\WebBased
             'item_name' => $this->getItemName(),
             'CustomerReferenceNr' => $this->transaction->getOrder()->getOrderNumber() ?: $this->transaction->getOrder()->getOrderId(),
             'want_shipping' => 0,
-            'transactionconfirmurl' => $this->getReturnURL('transactionID', true),
-            'transactionfailurl' => $this->getReturnURL('transactionID', true, true)
+            'transactionconfirmurl' => $this->getReturnURL('transaction_id', true),
+            'transactionfailurl' => $this->getReturnURL('transaction_id', true, true)
         );
 
         $billingAddress = $this->getProfile()->getBillingAddress();
