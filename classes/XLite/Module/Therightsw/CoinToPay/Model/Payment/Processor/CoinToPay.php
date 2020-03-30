@@ -41,6 +41,19 @@ class CoinToPay extends \XLite\Model\Payment\Base\WebBased
         $response_data['TransactionID'] = $request->TransactionID;
         $response_data['ConfirmCode'] = $request->ConfirmCode;
         $response_data['Status'] = $status;
+		$api_key = $this->getSetting('api_key');
+		$transactionData = $this->getTransactiondetail($response_data);
+		if(200 !== $transactionData['status_code']){
+			$this->transaction->setNote($transactionData['message']);
+            \XLite\Core\TopMessage::addWarning('Data tempered ! '.$transactionData['message']);
+		}
+		$value_data = "MerchantID=" . $transactionData['data']['MerchantID'] . "&AltCoinID=" . $transactionData['data']['AltCoinID'] . "&TransactionID=" . $request->TransactionID . "&coinAddress=" . $transactionData['data']['coinAddress'] . "&CustomerReferenceNr=" . 
+		$request->CustomerReferenceNr . "&SecurityCode=" . $transactionData['data']['SecurityCode'] . "&inputCurrency=" . $transactionData['data']['inputCurrency'];
+		$ConfirmCode = $this->fn_cointopay_calculateRFC2104HMAC($api_key, $value_data);
+		if($ConfirmCode !== $request->ConfirmCode){
+			$this->transaction->setNote('Data mismatch! Data doesn\'t match with Cointopay.');
+            \XLite\Core\TopMessage::addWarning('Data tempered ! Data mismatch! Data doesn\'t match with Cointopay.');
+		}
         $validation = $this->validateResponse($response_data);
         if(!$validation) {
             $this->transaction->setNote('Credentials do not match to Cointopay');
