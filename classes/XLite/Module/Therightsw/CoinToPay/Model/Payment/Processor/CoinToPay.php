@@ -103,12 +103,30 @@ class CoinToPay extends \XLite\Model\Payment\Base\WebBased
         $response_data['TransactionID'] = $request->TransactionID;
         $response_data['ConfirmCode'] = $request->ConfirmCode;
         $response_data['Status'] = $status;
+		$api_key = $this->getSetting('api_key');
+		$transactionData = $this->getTransactiondetail($response_data);
+		if(200 !== $transactionData['status_code']){
+			$this->transaction->setNote($transactionData['message']);
+            \XLite\Core\TopMessage::addWarning('Data tempered ! '.$transactionData['message']);
+		}
+		$value_data = "MerchantID=" . $transactionData['data']['MerchantID'] . "&AltCoinID=" . $transactionData['data']['AltCoinID'] . "&TransactionID=" . $request->TransactionID . "&coinAddress=" . $transactionData['data']['coinAddress'] . "&CustomerReferenceNr=" . 
+		$request->CustomerReferenceNr . "&SecurityCode=" . $transactionData['data']['SecurityCode'] . "&inputCurrency=" . $transactionData['data']['inputCurrency'];
+		$ConfirmCode = $this->fn_cointopay_calculateRFC2104HMAC($api_key, $value_data);
+		if($ConfirmCode !== $request->ConfirmCode){
+			$this->transaction->setNote('Data mismatch! Data doesn\'t match with Cointopay.');
+            \XLite\Core\TopMessage::addWarning('Data tempered ! Data mismatch! Data doesn\'t match with Cointopay.');
+		}
         $validation = $this->validateResponse($response_data);
         if(!$validation) {
             $this->transaction->setNote('Credentials do not match to Cointopay');
             \XLite\Core\TopMessage::addWarning('Data tempered ! Credentials do not match to Cointopay');
 
-        }elseif ($status == 'paid') {
+        }
+		elseif($validation->Status !== $status)
+		{
+			$this->transaction->setNote('We have detected different order status. Your order has been halted.');
+            \XLite\Core\TopMessage::addWarning('Data tempered ! We have detected different order status. Your order has been halted.');
+		}elseif ($status == 'paid') {
             $str = 'Payment successfully paid';
             $str .= 'Transaction ID: ' . $request->transaction_id . PHP_EOL;
             $transaction_status = $transaction::STATUS_SUCCESS;
@@ -343,5 +361,57 @@ class CoinToPay extends \XLite\Model\Payment\Base\WebBased
             ? $address->getCountry()->getCode3()
             : '';
     }
+		
+	/**
+     * @param $response
+     * @return array
+    */
+	public function getTransactiondetail( $data) {
+		$merchant_id = $this->getSetting('merchantId');
+		$params = array(
+       "authentication:1",
+       'cache-control: no-cache',
+       );
+       $ch = curl_init();
+       curl_setopt_array($ch, array(
+       CURLOPT_URL => 'https://app.cointopay.com/v2REAPI?',
+       //CURLOPT_USERPWD => $this->apikey,
+       CURLOPT_POSTFIELDS => 'Call=Transactiondetail&MerchantID='.$merchant_id.'&output=json&ConfirmCode='.$data['ConfirmCode'].'&APIKey=a',
+       CURLOPT_RETURNTRANSFER => true,
+       CURLOPT_SSL_VERIFYPEER => false,
+       CURLOPT_HTTPHEADER => $params,
+       CURLOPT_USERAGENT => 1,
+       CURLOPT_HTTPAUTH => CURLAUTH_BASIC
+       )
+       );
+       $response = curl_exec($ch);
+       $results = json_decode($response, true);
+       /*if($results->CustomerReferenceNr)
+       {
+           return $results;
+       }*/
+       return $results;
+       exit();
+
+	}//end getTransactiondetail()
+	
+	/**
+     * @param $key,$response
+     * @return string
+    */
+	public function calculateRFC2104HMAC ($key, $data)
+	{
+		$s = hash_hmac('sha256', $data, $key, true);
+
+		return strtoupper($this->base64url_encode($s));
+	}//end calculateRFC2104HMAC()
+	
+	/**
+     * @param $response
+     * @return string
+    */
+	public function base64url_encode($data) {
+		return strtoupper(rtrim(strtr(base64_encode($data), '+/', '-_'), '='));
+	}//end base64url_encode()
 
 }

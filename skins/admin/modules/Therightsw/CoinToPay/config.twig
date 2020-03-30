@@ -21,6 +21,15 @@
         </td>
     </tr>
     <tr>
+	<tr>
+        <td class="setting-name">
+            <label for="settings_securityCode">{{ t('API Key') }}</label>
+        </td>
+        <td>
+            <input type="text" id="settings_apiKey" name="settings[api_key]" value="{{ this.paymentMethod.getSetting('api_key') }}" class="validate[required,maxSize[255]]" />
+        </td>
+    </tr>
+    <tr>
         <input type="hidden" id="coin_id" value="{{ this.paymentMethod.getSetting('coin_id') }}">
         <td class="setting-name">
             <label for="settings_coinId">{{ t('Coin') }}</label>
