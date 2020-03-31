@@ -233,6 +233,7 @@ class CoinToPay extends \XLite\Model\Payment\Base\WebBased
         return parent::isConfigured($method)
             && $method->getSetting('merchantId')
             && $method->getSetting('security_code')
+			&& $method->getSetting('api_key')
             && $method->getSetting('coin_id');
     }
 
@@ -258,6 +259,7 @@ class CoinToPay extends \XLite\Model\Payment\Base\WebBased
         return array(
             'merchantId',
             'security_code',
+			'api_key',
             'coin_id'
         );
     }
