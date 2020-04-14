@@ -8,7 +8,9 @@ Cointopay.com crypto payment plugin for: **Xcart**
 
 Please sign up for an account at <https://cointopay.com/Signup.jsp> Cointopay.com.
 
-Note down the MerchantID, SecurityCode, APIKey and Currency, information is located in the Account section. These pieces of information are mandatory to be able to connect the payment module to your Xcart.
+Please follow the Xcart Cointopay Plugin install instructions mentioned here: <a href="https://docs.google.com/document/d/1fxj-BzAPBCFYv8I9uCjjztV5ELZEJBdwSJLBhFbSENI/edit?usp=sharing">download Xcart Cointopay Plugin documentation</a> or direct link: https://docs.google.com/document/d/1fxj-BzAPBCFYv8I9uCjjztV5ELZEJBdwSJLBhFbSENI/edit?usp=sharing
+
+Note down the MerchantID, SecurityCode and Currency, information is located in the Account section. These pieces of information are mandatory to be able to connect the payment module to your Xcart.
 
 ### Via Xcart Module Upload
 
@@ -18,12 +20,15 @@ Installation of coin to pay plugin can be done by following steps below
 2) Unzip the coin to pay plugin 
 3) Redirect to admin area of your website and from left menu Click on Store setup >> Cache Management  
 4) Click on start button in front of Re-deploy the store option
-5) Now click on Store setup >> payment methods
-6) On payment methods page Click on Add payment method and search for coin to pay and click install button
-7) After installation you will be redirected to Coin to pay settings page insert your merchant id, security code, api key and select coin for user transactions
-8) Make sure to activate the payment method
-9) If you want to configure coin to pay after installation then click on Store setup >> payment methods.
-10) Click on configure button in front of coin to pay from list of online methods.
+5) Click on My Addons from the left menu.
+6) Find Cointopay in list and Click on Cointopay  “ON”  button, it will be added to cart of my addons.
+7) Click on apply changes from the left  menu of My addons page.
+8) Now click on Store setup >> payment methods
+9) On payment methods page Click on Add payment method and search for coin to pay and click install button
+10) After installation you will be redirected to Coin to pay settings page insert your merchant id, security code and select coin for user transactions
+11) Make sure to activate the payment method
+12) If you want to configure coin to pay after installation then click on Store setup >> payment methods.
+13) Click on configure button in front of coin to pay from list of online methods.
 
 
 ### Testing

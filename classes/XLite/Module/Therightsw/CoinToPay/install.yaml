@@ -15,7 +15,4 @@ XLite\Model\Payment\Method:
     settings:
       - name: merchantId
       - name: security_code
-      - name: api_key
       - name: coin_id
-      - name: mode
-        value: live
