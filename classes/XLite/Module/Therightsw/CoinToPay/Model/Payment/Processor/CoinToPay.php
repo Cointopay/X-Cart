@@ -59,23 +59,23 @@ class CoinToPay extends \XLite\Model\Payment\Base\WebBased
 				$this->transaction->setNote('Data mismatch');
 				\XLite\Core\TopMessage::addWarning('Data mismatch! TransactionID doesn\'t match');
 			}
-			elseif($transactionData['data']['AltCoinID'] != $request->AltCoinID){
+			elseif(isset($request->AltCoinID) && $transactionData['data']['AltCoinID'] != $request->AltCoinID){
 				$this->transaction->setNote('Data mismatch');
-				\XLite\Core\TopMessage::addWarning('Data mismatch! AltCoinID doesn\'t match');
+				\XLite\Core\TopMessage::addWarning('1Data mismatch! AltCoinID doesn\'t match');
 			}
-			elseif($transactionData['data']['MerchantID'] != $request->MerchantID){
+			elseif(isset($request->MerchantID) && $transactionData['data']['MerchantID'] != $request->MerchantID){
 				$this->transaction->setNote('Data mismatch');
 				\XLite\Core\TopMessage::addWarning('Data mismatch! MerchantID doesn\'t match');
 			}
-			elseif($transactionData['data']['coinAddress'] != $request->CoinAddressUsed){
+			elseif(isset($request->CoinAddressUsed) && $transactionData['data']['coinAddress'] != $request->CoinAddressUsed){
 				$this->transaction->setNote('Data mismatch');
 				\XLite\Core\TopMessage::addWarning('Data mismatch! CoinAddress doesn\'t match');
 			}
-			elseif($transactionData['data']['SecurityCode'] != $request->SecurityCode){
+			elseif(isset($request->SecurityCode) && $transactionData['data']['SecurityCode'] != $request->SecurityCode){
 				$this->transaction->setNote('Data mismatch');
 				\XLite\Core\TopMessage::addWarning('Data mismatch! SecurityCode doesn\'t match');
 			}
-			elseif($transactionData['data']['inputCurrency'] != $request->inputCurrency){
+			elseif(isset($request->inputCurrency) && $transactionData['data']['inputCurrency'] != $request->inputCurrency){
 				$this->transaction->setNote('Data mismatch');
 				\XLite\Core\TopMessage::addWarning('Data mismatch! inputCurrency doesn\'t match');
 			}
@@ -167,23 +167,23 @@ class CoinToPay extends \XLite\Model\Payment\Base\WebBased
 				$this->transaction->setNote('Data mismatch');
 				\XLite\Core\TopMessage::addWarning('Data mismatch! TransactionID doesn\'t match');
 			}
-			elseif($transactionData['data']['AltCoinID'] != $request->AltCoinID){
+			elseif(isset($request->AltCoinID) && $transactionData['data']['AltCoinID'] != $request->AltCoinID){
 				$this->transaction->setNote('Data mismatch');
-				\XLite\Core\TopMessage::addWarning('Data mismatch! AltCoinID doesn\'t match');
+				\XLite\Core\TopMessage::addWarning('1Data mismatch! AltCoinID doesn\'t match');
 			}
-			elseif($transactionData['data']['MerchantID'] != $request->MerchantID){
+			elseif(isset($request->MerchantID) && $transactionData['data']['MerchantID'] != $request->MerchantID){
 				$this->transaction->setNote('Data mismatch');
 				\XLite\Core\TopMessage::addWarning('Data mismatch! MerchantID doesn\'t match');
 			}
-			elseif($transactionData['data']['coinAddress'] != $request->CoinAddressUsed){
+			elseif(isset($request->CoinAddressUsed) && $transactionData['data']['coinAddress'] != $request->CoinAddressUsed){
 				$this->transaction->setNote('Data mismatch');
 				\XLite\Core\TopMessage::addWarning('Data mismatch! CoinAddress doesn\'t match');
 			}
-			elseif($transactionData['data']['SecurityCode'] != $request->SecurityCode){
+			elseif(isset($request->SecurityCode) && $transactionData['data']['SecurityCode'] != $request->SecurityCode){
 				$this->transaction->setNote('Data mismatch');
 				\XLite\Core\TopMessage::addWarning('Data mismatch! SecurityCode doesn\'t match');
 			}
-			elseif($transactionData['data']['inputCurrency'] != $request->inputCurrency){
+			elseif(isset($request->inputCurrency) && $transactionData['data']['inputCurrency'] != $request->inputCurrency){
 				$this->transaction->setNote('Data mismatch');
 				\XLite\Core\TopMessage::addWarning('Data mismatch! inputCurrency doesn\'t match');
 			}
